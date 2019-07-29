@@ -6,7 +6,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/LuizEclipse/ProjetoDesktop/mysql-connector-java-5.1.47.jar"/>
 	<classpathentry kind="lib" path="jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="mysql-connector-java-5.1.47.jar"/>
+	<classpathentry kind="lib" path="src/br/com/desktop/frames/itextpdf-5.5.9.jar"/>
+	<classpathentry kind="lib" path="src/br/com/desktop/frames/rs2xml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

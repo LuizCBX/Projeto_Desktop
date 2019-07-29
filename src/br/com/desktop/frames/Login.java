@@ -31,6 +31,7 @@ public class Login extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtUser;
 	private JPasswordField txtPassword;
+	private JButton btnLogin;
 
 	/**
 	 * Launch the application.
@@ -82,7 +83,7 @@ public class Login extends JFrame {
 		contentPane.add(txtUser);
 		txtUser.setColumns(10);
 		
-		JButton btnLogin = new JButton("");
+		btnLogin = new JButton("");
 		btnLogin.setToolTipText("Entrar");
 		btnLogin.setIcon(new ImageIcon(Login.class.getResource("/br/com/desktop/icons/log-in.png")));
 		btnLogin.addActionListener(new ActionListener() {
@@ -112,6 +113,9 @@ public class Login extends JFrame {
 			//System.out.println("erro de conexão");
 			lblStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/desktop/icons/dberror.png")));
 		}
+		
+		//ENTER AUTOMATICO
+		getRootPane().setDefaultButton(btnLogin);
 				
 	}//fim construtor
 	
@@ -122,9 +126,12 @@ public class Login extends JFrame {
 		txtPassword.setText(null);
 	}
 	
+	
+
+	
 	//login --
 	private void login() {
-		String read = "select * from tb_usuario where login=? and senha=?";
+		String read = "select * from tb_usuarios where loginUsuario=? and senhaUsuario=?";
 		try {
 			pst = con.prepareStatement(read);
 			pst.setString(1,txtUser.getText());
@@ -151,6 +158,8 @@ public class Login extends JFrame {
 			System.out.println(e);
 		}
 		
+
 		
 	}
+
 }

@@ -6,8 +6,12 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import br.com.desktop.cep.CepWebService;
+
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -17,13 +21,14 @@ import java.awt.Font;
 import javax.swing.JButton;
 import java.awt.Toolkit;
 import java.awt.SystemColor;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class TipoEspecialista extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField txtPesquisar;
 	private JTable table;
-	private JTextField txtTipoLogradouro;
 	private JTextField txtLogradouro;
 	private JTextField txtNumero;
 	private JTextField txtComplemento;
@@ -34,7 +39,7 @@ public class TipoEspecialista extends JFrame {
 	private JTextField txtFone2;
 	private JTextField txtCep;
 	private JTextField txtCpf;
-
+	private JComboBox  cboUf;
 	/**
 	 * Launch the application.
 	 */
@@ -105,13 +110,8 @@ public class TipoEspecialista extends JFrame {
 		lblComplemento.setBounds(573, 306, 118, 14);
 		contentPane.add(lblComplemento);
 		
-		txtTipoLogradouro = new JTextField();
-		txtTipoLogradouro.setBounds(80, 303, 96, 20);
-		contentPane.add(txtTipoLogradouro);
-		txtTipoLogradouro.setColumns(10);
-		
 		txtLogradouro = new JTextField();
-		txtLogradouro.setBounds(186, 303, 193, 20);
+		txtLogradouro.setBounds(80, 303, 299, 20);
 		contentPane.add(txtLogradouro);
 		txtLogradouro.setColumns(10);
 		
@@ -155,10 +155,10 @@ public class TipoEspecialista extends JFrame {
 		lblUf.setBounds(637, 336, 48, 14);
 		contentPane.add(lblUf);
 		
-		JComboBox cbUf = new JComboBox();
-		cbUf.setModel(new DefaultComboBoxModel(new String[] {"", "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"}));
-		cbUf.setBounds(695, 334, 69, 22);
-		contentPane.add(cbUf);
+		JComboBox cboUf = new JComboBox();
+		cboUf.setModel(new DefaultComboBoxModel(new String[] {"", "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"}));
+		cboUf.setBounds(695, 334, 69, 22);
+		contentPane.add(cboUf);
 		
 		JLabel lblFone1 = new JLabel("* FONE 1:");
 		lblFone1.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -209,6 +209,12 @@ public class TipoEspecialista extends JFrame {
 		contentPane.add(btnApagar);
 		
 		JButton btnBuscaCep = new JButton("Buscar CEP");
+		btnBuscaCep.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				buscarCep();
+			}
+		});
 		btnBuscaCep.setBounds(648, 266, 116, 23);
 		contentPane.add(btnBuscaCep);
 		
@@ -237,19 +243,38 @@ public class TipoEspecialista extends JFrame {
 		lblSexo.setBounds(261, 270, 48, 14);
 		contentPane.add(lblSexo);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"", "M", "F"}));
-		comboBox.setBounds(319, 266, 60, 22);
-		contentPane.add(comboBox);
+		JComboBox cboSexo = new JComboBox();
+		cboSexo.setModel(new DefaultComboBoxModel(new String[] {"", "M", "F"}));
+		cboSexo.setBounds(319, 266, 60, 22);
+		contentPane.add(cboSexo);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"None", "Fonoaudi\u00F3logo(a)", "Nutricionista", "Fisioterapeuta", "Vocal Coach"}));
-		comboBox_1.setBounds(593, 234, 171, 22);
-		contentPane.add(comboBox_1);
+		JComboBox cboEspecialidade = new JComboBox();
+		cboEspecialidade.setModel(new DefaultComboBoxModel(new String[] {"None", "Fonoaudi\u00F3logo(a)", "Nutricionista", "Fisioterapeuta", "Vocal Coach"}));
+		cboEspecialidade.setBounds(593, 234, 171, 22);
+		contentPane.add(cboEspecialidade);
 		
 		JLabel lblEspecialidade = new JLabel("* ESPECIALIDADE:");
 		lblEspecialidade.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEspecialidade.setBounds(462, 238, 121, 14);
 		contentPane.add(lblEspecialidade);
+			
+	}
+	
+	// método para buscar o CEP
+	private void buscarCep() {
+		try {
+			String cep = txtCep.getText();
+			CepWebService cepWebService = new CepWebService(cep);
+			if (cepWebService.getResultado() == 1) {
+				txtLogradouro.setText(cepWebService.getTipo_logradouro() + " " + cepWebService.getLogradouro());
+				txtBairro.setText(cepWebService.getBairro());
+				txtCidade.setText(cepWebService.getCidade());
+				cboUf.setSelectedItem(cepWebService.getUf());
+			} else {
+				JOptionPane.showMessageDialog(null, "Não foi possível obter o CEP");
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 }

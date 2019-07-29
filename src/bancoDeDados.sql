@@ -25,6 +25,7 @@ bairro varchar(40) not null,
 cidade varchar(50) not null,
 estado char (3) not null
 );
+describe tb_endereco;
 
 create table tb_preco(
 id int auto_increment primary key,
@@ -72,17 +73,22 @@ dia date not null,
 hora time not null
 ); 
 
+ALTER TABLE `db_clinica`.`tb_horario` 
+CHANGE COLUMN `hora4` `hora5` VARCHAR(45) NULL DEFAULT NULL ;
+
 
 create table tb_consulta(
 id int primary key auto_increment,
 tiposervico varchar(30) not null,
-idcliente varchar(30) not null,
-idhorario date not null,
-idservico varchar(200) not null,
-idprofissional varchar(50) not null,
-idpreco decimal(10,2),
+idcliente int not null,
+idhorario int not null,
+idservico int not null,	
+idprofissional int not null,
+idpreco int not null,
 observacao varchar(200)
 );
+select * from tb_consulta;
+describe tb_consulta;
 
 
 

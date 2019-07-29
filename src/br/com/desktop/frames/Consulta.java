@@ -18,10 +18,18 @@ import javax.swing.border.LineBorder;
 import javax.swing.text.MaskFormatter;
 
 import java.awt.Color;
+import java.awt.Desktop;
+
 import javax.swing.SwingConstants;
 import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.awt.event.ActionEvent;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.toedter.calendar.JDateChooser;
 import java.awt.SystemColor;
 
@@ -197,8 +205,33 @@ public class Consulta extends JFrame {
 		button_1.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/delete.png")));
 		
 		JButton btnNewButton_1 = new JButton("");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				pdfImprimir();
+			}
+		});
 		btnNewButton_1.setBounds(306, 36, 64, 64);
 		panel_1.add(btnNewButton_1);
 		btnNewButton_1.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/impressora.png")));
+	}
+	
+	private void pdfImprimir() {
+		
+		Document document = new Document();
+		try {
+			PdfWriter.getInstance(document, new FileOutputStream("imprimir.pdf"));
+			document.open();
+			document.add(new Paragraph("Relatório do agendamento!"));
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally{
+			document.close();
+		}
+		try {
+			Desktop.getDesktop().open(new File("imprimir.pdf"));
+		} catch (Exception e2) {
+			System.out.println(e2);
+		}
 	}
 }

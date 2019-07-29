@@ -21,7 +21,7 @@ public class ConnectionModule {
 		
 		//tratamento de exceções
 		try {
-			Class.forName(driver);//usar o driver
+			Class.forName(driver).newInstance();//usar o driver
 			conexao = DriverManager.getConnection(url, user, password);
 			return conexao;
 		} catch (Exception e) {

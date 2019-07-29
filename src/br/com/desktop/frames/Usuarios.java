@@ -225,7 +225,7 @@ public class Usuarios extends JFrame {
 	private void adicionar() {
 		
 
-		String create = "insert into tb_usuario (id, usuario, foneUsuario, login, senha) values(?,?,?,?,?)";
+		String create = "insert into tb_usuarios (idUsuario, usuario, foneUsuario, loginUsuario, senhaUsuario) values(?,?,?,?,?)";
 		try {
 				pst = (PreparedStatement) con.prepareStatement(create);
 				//passagem de parametros
@@ -255,7 +255,7 @@ public class Usuarios extends JFrame {
 	
 	//PESQUISAR USUARIO
 	private void pesquisar() {
-		String read = "select * from tb_usuario where id =?";
+		String read = "select * from tb_usuarios where id =?";
 		// Usamos o try catch para tratar exceção
 		try {
 				pst = (PreparedStatement) con.prepareStatement(read);
@@ -281,7 +281,7 @@ public class Usuarios extends JFrame {
 	//ATUALIZAR USUARIOS
 	
 	private void atualizar() {
-		String update = "update tb_usuario set usuario=?, foneUsuario=?, login=?, senha=? where id=?";
+		String update = "update tb_usuarios set usuarios=?, foneUsuario=?, loginUsuario=?, senhaUsuario=? where idUsuario=?";
 		try {
 			pst = (PreparedStatement) con.prepareStatement(update);
 			// passagem de parâmetros
@@ -313,7 +313,7 @@ public class Usuarios extends JFrame {
 		int confirma = JOptionPane.showConfirmDialog(null, "Confirma a exclusão deste usuário ?", "Atenção",
 				JOptionPane.YES_NO_OPTION);
 		if (confirma == JOptionPane.YES_NO_OPTION) {
-			String delete = "delete from tb_usuario where id=?";
+			String delete = "delete from tb_usuarios where id=?";
 
 			try {
 					pst = (PreparedStatement) con.prepareStatement(delete);
