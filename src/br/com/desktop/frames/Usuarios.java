@@ -255,7 +255,7 @@ public class Usuarios extends JFrame {
 	
 	//PESQUISAR USUARIO
 	private void pesquisar() {
-		String read = "select * from tb_usuarios where id =?";
+		String read = "select * from tb_usuarios where idUsuario =?";
 		// Usamos o try catch para tratar exceção
 		try {
 				pst = (PreparedStatement) con.prepareStatement(read);
@@ -313,7 +313,7 @@ public class Usuarios extends JFrame {
 		int confirma = JOptionPane.showConfirmDialog(null, "Confirma a exclusão deste usuário ?", "Atenção",
 				JOptionPane.YES_NO_OPTION);
 		if (confirma == JOptionPane.YES_NO_OPTION) {
-			String delete = "delete from tb_usuarios where id=?";
+			String delete = "delete from tb_usuarios where idUsuario=?";
 
 			try {
 					pst = (PreparedStatement) con.prepareStatement(delete);

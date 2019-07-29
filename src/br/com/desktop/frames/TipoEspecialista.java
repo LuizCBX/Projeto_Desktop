@@ -8,6 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import br.com.desktop.cep.CepWebService;
+import br.com.desktop.dal.ConnectionModule;
+import net.proteanit.sql.DbUtils;
 
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -22,13 +24,20 @@ import javax.swing.JButton;
 import java.awt.Toolkit;
 import java.awt.SystemColor;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.awt.event.ActionEvent;
 
 public class TipoEspecialista extends JFrame {
+	
+	Connection con = ConnectionModule.conector();
+	PreparedStatement pst = null;
+	ResultSet rs = null;
 
 	private JPanel contentPane;
 	private JTextField txtPesquisar;
-	private JTable table;
+	private JTable tblClientes;
 	private JTextField txtLogradouro;
 	private JTextField txtNumero;
 	private JTextField txtComplemento;
@@ -40,6 +49,8 @@ public class TipoEspecialista extends JFrame {
 	private JTextField txtCep;
 	private JTextField txtCpf;
 	private JComboBox  cboUf;
+	private JComboBox cboFuncao;
+	private JTextField txtNome;
 	/**
 	 * Launch the application.
 	 */
@@ -86,9 +97,9 @@ public class TipoEspecialista extends JFrame {
 		lblCamposObrigatrio.setBounds(524, 29, 180, 14);
 		contentPane.add(lblCamposObrigatrio);
 		
-		table = new JTable();
-		table.setBounds(22, 66, 742, 143);
-		contentPane.add(table);
+		tblClientes = new JTable();
+		tblClientes.setBounds(22, 66, 742, 143);
+		contentPane.add(tblClientes);
 		
 		JLabel lblNome = new JLabel("* NOME");
 		lblNome.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -215,7 +226,7 @@ public class TipoEspecialista extends JFrame {
 				buscarCep();
 			}
 		});
-		btnBuscaCep.setBounds(648, 266, 116, 23);
+		btnBuscaCep.setBounds(637, 265, 116, 23);
 		contentPane.add(btnBuscaCep);
 		
 		txtCep = new JTextField();
@@ -238,25 +249,15 @@ public class TipoEspecialista extends JFrame {
 		lblCpf.setBounds(22, 270, 48, 14);
 		contentPane.add(lblCpf);
 		
-		JLabel lblSexo = new JLabel("* SEXO:");
-		lblSexo.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblSexo.setBounds(261, 270, 48, 14);
-		contentPane.add(lblSexo);
+		JComboBox cboFuncao = new JComboBox();
+		cboFuncao.setModel(new DefaultComboBoxModel(new String[] {"None", "Fonoaudi\u00F3logo(a)", "Nutricionista", "Fisioterapeuta", "Vocal Coach"}));
+		cboFuncao.setBounds(593, 234, 171, 22);
+		contentPane.add(cboFuncao);
 		
-		JComboBox cboSexo = new JComboBox();
-		cboSexo.setModel(new DefaultComboBoxModel(new String[] {"", "M", "F"}));
-		cboSexo.setBounds(319, 266, 60, 22);
-		contentPane.add(cboSexo);
-		
-		JComboBox cboEspecialidade = new JComboBox();
-		cboEspecialidade.setModel(new DefaultComboBoxModel(new String[] {"None", "Fonoaudi\u00F3logo(a)", "Nutricionista", "Fisioterapeuta", "Vocal Coach"}));
-		cboEspecialidade.setBounds(593, 234, 171, 22);
-		contentPane.add(cboEspecialidade);
-		
-		JLabel lblEspecialidade = new JLabel("* ESPECIALIDADE:");
-		lblEspecialidade.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblEspecialidade.setBounds(462, 238, 121, 14);
-		contentPane.add(lblEspecialidade);
+		JLabel lblFuncao = new JLabel("* FUN\u00C7\u00C3O:");
+		lblFuncao.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblFuncao.setBounds(462, 238, 121, 14);
+		contentPane.add(lblFuncao);
 			
 	}
 	
@@ -277,4 +278,58 @@ public class TipoEspecialista extends JFrame {
 			System.out.println(e);
 		}
 	}
+	
+	
+private void adicionarCliente () {
+		
+		String create = "insert into tb_clientes (nomePro, funcao, cep, logradouro, numero, complemento, bairro, cidade, uf, fone1, fone2, cpfPro, emailPro) "
+				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		try {
+			
+			pst = con.prepareStatement(create);
+			//passagem de parametros
+			pst.setString(1, txtNome.getText());
+			pst.setString(2, cboFuncao.getSelectedItem().toString());
+			pst.setString(3, txtCep.getText());
+			pst.setString(4, txtLogradouro.getText());
+			pst.setString(5, txtNumero.getText());
+			pst.setString(6, txtComplemento.getText());
+			pst.setString(7, txtBairro.getText());
+			pst.setString(8, txtCidade.getText());
+			pst.setString(9, cboUf.getSelectedItem().toString());
+			pst.setString(10, txtFone1.getSelectedText());
+			pst.setString(11, txtFone2.getText());
+			pst.setString(12, txtCpf.getText());
+			pst.setString(13, txtEmail.getText());
+			
+			int r = pst.executeUpdate();
+			if(r > 0) {
+				
+				JOptionPane.showMessageDialog(null, "Profissional adicionado com sucesso");
+				//limpar();				
+			} else {
+				JOptionPane.showMessageDialog(null, "Não foi possivel cadastrar");
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	
+	
+	//METODO PESQUISAR CLIENTES PELO NOME COM FILTRO
+	private void pesquisarCliente() {
+        String read = "select * from tb_clientes where nomeCli like ?";
+        try {
+            pst = (PreparedStatement) con.prepareStatement(read);
+            //atenção ao "%" - continuação da String sql
+            pst.setString(1, txtPesquisar.getText() + "%");
+            rs = pst.executeQuery();
+            // a linha abaixo usa a biblioteca rs2xml.jar para preencher a tabela
+            tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
+
+        } catch (Exception e) {
+			System.out.println(e);
+		}
+    }
 }
