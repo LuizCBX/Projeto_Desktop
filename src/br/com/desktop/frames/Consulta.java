@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Toolkit;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -25,20 +26,36 @@ import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.awt.event.ActionEvent;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.mysql.jdbc.PreparedStatement;
 import com.toedter.calendar.JDateChooser;
+
+import br.com.desktop.dal.ConnectionModule;
+
 import java.awt.SystemColor;
 
 public class Consulta extends JFrame {
+	
+	Connection con = ConnectionModule.conector();
+	PreparedStatement pst = null;
+	ResultSet rs = null;
+
 
 	private JPanel contentPane;
 	private JTextField txtPaciente;
 	private JTextField txtId;
 	private JTextField txtPreco;
+	private JDateChooser dtConsulta;
+	private JComboBox cboHorario;
+	private JComboBox cboTipo;
+	private JComboBox cboNome;
+	private JComboBox cboSituacao;
 
 	/**
 	 * Launch the application.
@@ -126,34 +143,34 @@ public class Consulta extends JFrame {
 			dataConsulta= new MaskFormatter("##/##/####");
 		} catch (Exception e) {e.printStackTrace();}
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(184, 65, 145, 22);
-		panel_2.add(comboBox);
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"None", "Fonoaudi\u00F3logo(a)", "Nutricionista", "Fisioterapeuta", "Vocal Coach"}));
+		 cboTipo = new JComboBox();
+		cboTipo.setBounds(184, 65, 145, 22);
+		panel_2.add(cboTipo);
+		cboTipo.setModel(new DefaultComboBoxModel(new String[] {"None", "Fonoaudi\u00F3logo(a)", "Nutricionista", "Fisioterapeuta", "Vocal Coach"}));
 		
 		JLabel lblTipoDeEspecialista = new JLabel("TIPO DE ESPECIALISTA:\r\n");
 		lblTipoDeEspecialista.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTipoDeEspecialista.setBounds(-2, 69, 176, 14);
 		panel_2.add(lblTipoDeEspecialista);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"None", "Dr. Leandro Augusto", "Dr. Luiz Henrique", "Dr. Matheus Motta", "Dr. Murillo Ramos", "Dra. Geovana Sousa"}));
-		comboBox_1.setBounds(184, 98, 145, 22);
-		panel_2.add(comboBox_1);
+		cboNome = new JComboBox();
+		cboNome.setModel(new DefaultComboBoxModel(new String[] {"None", "Dr. Leandro Augusto", "Dr. Luiz Henrique", "Dr. Matheus Motta", "Dr. Murillo Ramos", "Dra. Geovana Sousa"}));
+		cboNome.setBounds(184, 98, 145, 22);
+		panel_2.add(cboNome);
 		
 		JLabel lblDoutor = new JLabel("NOME DO ESPECIALISTA:\r\n");
 		lblDoutor.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblDoutor.setBounds(-2, 102, 176, 14);
 		panel_2.add(lblDoutor);
 		
-		JDateChooser dateChooser = new JDateChooser();
-		dateChooser.setBounds(184, 5, 145, 20);
-		panel_2.add(dateChooser);
+		dtConsulta = new JDateChooser();
+		dtConsulta.setBounds(184, 5, 145, 20);
+		panel_2.add(dtConsulta);
 		
-		JComboBox comboBox_2 = new JComboBox();
-		comboBox_2.setModel(new DefaultComboBoxModel(new String[] {"None", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"}));
-		comboBox_2.setBounds(184, 33, 145, 22);
-		panel_2.add(comboBox_2);
+		cboHorario = new JComboBox();
+		cboHorario.setModel(new DefaultComboBoxModel(new String[] {"None", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"}));
+		cboHorario.setBounds(184, 33, 145, 22);
+		panel_2.add(cboHorario);
 		
 		JLabel lblPreco = new JLabel("PRE\u00C7O CONSULTA:");
 		lblPreco.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -175,12 +192,18 @@ public class Consulta extends JFrame {
 		lblSituacao.setBounds(10, 11, 164, 14);
 		panel_1.add(lblSituacao);
 		
-		JComboBox comboBox_3 = new JComboBox();
-		comboBox_3.setModel(new DefaultComboBoxModel(new String[] {"", "AGENDADO", "AGENDAMENTO INCOMPLETO", "AGENDAMENTO CANCELADO"}));
-		comboBox_3.setBounds(184, 7, 186, 22);
-		panel_1.add(comboBox_3);
+		cboSituacao = new JComboBox();
+		cboSituacao.setModel(new DefaultComboBoxModel(new String[] {"", "AGENDADO", "AGENDAMENTO INCOMPLETO", "AGENDAMENTO CANCELADO"}));
+		cboSituacao.setBounds(184, 7, 186, 22);
+		panel_1.add(cboSituacao);
 		
 		JButton button = new JButton("");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				adicionarConsulta();
+			}
+		});
 		button.setBounds(10, 36, 64, 64);
 		panel_1.add(button);
 		button.setToolTipText("Agendar consulta");
@@ -234,4 +257,40 @@ public class Consulta extends JFrame {
 			System.out.println(e2);
 		}
 	}
+	
+	
+	
+	//CRUD
+	
+	
+	//ADICIONAR
+	
+	private void adicionarConsulta() {
+		String create = "insert into tb_consulta (dataConsulta, horarioConsulta, tipoEspecialista, nomeEspecialista, preco, situacaoConsulta)"
+				+ "values(?,?,?,?,?,?)";
+		try {
+			pst = (PreparedStatement) con.prepareStatement(create);
+			// passagem de parâmetros
+			pst.setString(1, dtConsulta.getDateFormatString());
+			pst.setString(2, cboHorario.getSelectedItem().toString());
+			pst.setString(3, cboTipo.getSelectedItem().toString());
+			pst.setString(4, cboNome.getSelectedItem().toString());
+			pst.setString(5, txtPreco.getText());
+			pst.setString(6, cboSituacao.getSelectedItem().toString());
+
+			
+			int r = pst.executeUpdate();
+			if (r > 0) {
+				JOptionPane.showMessageDialog(null, "Consulta cadastrada com sucesso!");
+				//limpar();
+			} // fim do if
+			else {
+				JOptionPane.showMessageDialog(null, "Não foi possivel cadastrar");
+			} // fim do else
+		} // fim do try
+		catch (Exception e) {
+			System.out.println(e);
+		} // fim do catch
+
+	}// fim do construtor
 }

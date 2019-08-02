@@ -307,24 +307,24 @@ public class Clientes extends JFrame {
 	
 	private void adicionarCliente () {
 		
-		String create = "insert into tb_clientes (nomeCli, cep, logradouro, numero, complemento, bairro, cidade, uf, fone1, fone2, cpfCli, emailCli) "
-				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String create = "insert into tb_clientes (idCli, nomeCli, cep, logradouro, numero, complemento, bairro, cidade, uf, fone1, fone2, cpfCli, emailCli) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try {
 			
 			pst = con.prepareStatement(create);
 			//passagem de parametros
-			pst.setString(1, txtNome.getText());
-			pst.setString(2, txtCep.getText());
-			pst.setString(3, txtLogradouro.getText());
-			pst.setString(4, txtNumero.getText());
-			pst.setString(5, txtComplemento.getText());
-			pst.setString(6, txtBairro.getText());
-			pst.setString(7, txtCidade.getText());
-			pst.setString(8, cboUf.getSelectedItem().toString());
-			pst.setString(9, txtFone1.getSelectedText());
-			pst.setString(10, txtFone2.getText());
-			pst.setString(11, txtCpf.getText());
-			pst.setString(12, txtEmail.getText());
+			pst.setString(1, txtPesquisar.getText());
+			pst.setString(2, txtNome.getText());
+			pst.setString(3, txtCep.getText());
+			pst.setString(4, txtLogradouro.getText());
+			pst.setString(5, txtNumero.getText());
+			pst.setString(6, txtComplemento.getText());
+			pst.setString(7, txtBairro.getText());
+			pst.setString(8, txtCidade.getText());
+			pst.setString(9, cboUf.getSelectedItem().toString());
+			pst.setString(10, txtFone1.getSelectedText());
+			pst.setString(11, txtFone2.getText());
+			pst.setString(12, txtCpf.getText());
+			pst.setString(13, txtEmail.getText());
 			
 			int r = pst.executeUpdate();
 			if(r > 0) {
