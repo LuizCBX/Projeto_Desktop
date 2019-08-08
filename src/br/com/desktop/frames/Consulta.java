@@ -37,8 +37,16 @@ import com.mysql.jdbc.PreparedStatement;
 import com.toedter.calendar.JDateChooser;
 
 import br.com.desktop.dal.ConnectionModule;
+import net.proteanit.sql.DbUtils;
 
 import java.awt.SystemColor;
+import java.awt.ScrollPane;
+import javax.swing.JTable;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Consulta extends JFrame {
 	
@@ -48,14 +56,19 @@ public class Consulta extends JFrame {
 
 
 	private JPanel contentPane;
-	private JTextField txtPaciente;
+	private JTextField txtIdConsulta;
 	private JTextField txtId;
 	private JTextField txtPreco;
-	private JDateChooser dtConsulta;
 	private JComboBox cboHorario;
 	private JComboBox cboTipo;
 	private JComboBox cboNome;
 	private JComboBox cboSituacao;
+	private JTextField dtConsulta;
+	private JTable table;
+	private JTextField txtID;
+	private JTextField txtNome;
+	private JTextField txtCPF;
+	private JTextField txtFone;
 
 	/**
 	 * Launch the application.
@@ -80,51 +93,16 @@ public class Consulta extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Consulta.class.getResource("/br/com/desktop/icons/consulta1.png")));
 		setTitle("Consulta");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 415, 511);
+		setBounds(100, 100, 415, 623);
 		contentPane = new JPanel();
 		contentPane.setBackground(SystemColor.activeCaption);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel.setBounds(10, 11, 379, 154);
-		contentPane.add(panel);
-		panel.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel("Paciente:");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNewLabel.setBounds(0, 17, 58, 14);
-		panel.add(lblNewLabel);
-		
-		txtPaciente = new JTextField();
-		txtPaciente.setBounds(68, 14, 134, 20);
-		panel.add(txtPaciente);
-		txtPaciente.setColumns(10);
-		
-		JLabel lblNewLabel_1 = new JLabel("");
-		lblNewLabel_1.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/pesquisar.png")));
-		lblNewLabel_1.setBounds(212, 11, 32, 32);
-		panel.add(lblNewLabel_1);
-		
-		txtId = new JTextField();
-		txtId.setColumns(10);
-		txtId.setBounds(297, 14, 41, 20);
-		panel.add(txtId);
-		
-		JLabel lblId = new JLabel("ID:");
-		lblId.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblId.setBounds(255, 17, 32, 14);
-		panel.add(lblId);
-		
-		JTextPane textPane = new JTextPane();
-		textPane.setBounds(10, 54, 359, 90);
-		panel.add(textPane);
-		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_2.setBounds(10, 176, 379, 154);
+		panel_2.setBounds(10, 286, 379, 156);
 		contentPane.add(panel_2);
 		panel_2.setLayout(null);
 		
@@ -163,10 +141,6 @@ public class Consulta extends JFrame {
 		lblDoutor.setBounds(-2, 102, 176, 14);
 		panel_2.add(lblDoutor);
 		
-		dtConsulta = new JDateChooser();
-		dtConsulta.setBounds(184, 5, 145, 20);
-		panel_2.add(dtConsulta);
-		
 		cboHorario = new JComboBox();
 		cboHorario.setModel(new DefaultComboBoxModel(new String[] {"None", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"}));
 		cboHorario.setBounds(184, 33, 145, 22);
@@ -182,8 +156,13 @@ public class Consulta extends JFrame {
 		panel_2.add(txtPreco);
 		txtPreco.setColumns(10);
 		
+		dtConsulta = new JTextField();
+		dtConsulta.setColumns(10);
+		dtConsulta.setBounds(183, 8, 146, 20);
+		panel_2.add(dtConsulta);
+		
 		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(10, 341, 379, 120);
+		panel_1.setBounds(10, 453, 379, 120);
 		contentPane.add(panel_1);
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_1.setLayout(null);
@@ -210,18 +189,37 @@ public class Consulta extends JFrame {
 		button.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/create.png")));
 		
 		JButton button_2 = new JButton("");
+		button_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				pesquisarConsulta();
+			}
+		});
 		button_2.setBounds(84, 36, 64, 64);
 		panel_1.add(button_2);
 		button_2.setToolTipText("Pesquisar consulta");
 		button_2.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/read.png")));
 		
 		JButton btnNewButton = new JButton("New button");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				alterarConsulta();
+				
+			}
+		});
 		btnNewButton.setBounds(158, 36, 64, 64);
 		panel_1.add(btnNewButton);
 		btnNewButton.setToolTipText("Editar consulta");
 		btnNewButton.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/update.png")));
 		
 		JButton button_1 = new JButton("New button");
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				removerConsulta();
+			}
+		});
 		button_1.setBounds(232, 36, 64, 64);
 		panel_1.add(button_1);
 		button_1.setToolTipText("Apagar consulta");
@@ -237,6 +235,90 @@ public class Consulta extends JFrame {
 		btnNewButton_1.setBounds(306, 36, 64, 64);
 		panel_1.add(btnNewButton_1);
 		btnNewButton_1.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/impressora.png")));
+		
+		JLabel lblNewLabel = new JLabel("ID PACIENTE:");
+		lblNewLabel.setBounds(10, 18, 87, 14);
+		contentPane.add(lblNewLabel);
+		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtIdConsulta = new JTextField();
+		txtIdConsulta.setBounds(107, 15, 69, 20);
+		contentPane.add(txtIdConsulta);
+		txtIdConsulta.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				
+				pesquisarPaciente();
+			}
+		});
+		txtIdConsulta.setColumns(10);
+		
+		JLabel lblNewLabel_1 = new JLabel("");
+		lblNewLabel_1.setBounds(181, 12, 32, 32);
+		contentPane.add(lblNewLabel_1);
+		lblNewLabel_1.setIcon(new ImageIcon(Consulta.class.getResource("/br/com/desktop/icons/pesquisar.png")));
+		
+		JLabel lblId = new JLabel("ID CONSULTA:");
+		lblId.setBounds(213, 18, 86, 14);
+		contentPane.add(lblId);
+		lblId.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtId = new JTextField();
+		txtId.setBounds(317, 15, 72, 20);
+		contentPane.add(txtId);
+		txtId.setColumns(10);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 55, 379, 106);
+		contentPane.add(scrollPane);
+		
+		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				setarCampos();
+			}
+		});
+		scrollPane.setViewportView(table);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(10, 184, 379, 77);
+		contentPane.add(panel);
+		panel.setLayout(null);
+		
+		JLabel lblId_1 = new JLabel("ID:");
+		lblId_1.setBounds(10, 11, 48, 14);
+		panel.add(lblId_1);
+		
+		JLabel lblNome = new JLabel("Nome Paciente:");
+		lblNome.setBounds(141, 11, 98, 14);
+		panel.add(lblNome);
+		
+		JLabel lblCpf = new JLabel("CPF:");
+		lblCpf.setBounds(10, 49, 48, 14);
+		panel.add(lblCpf);
+		
+		JLabel lblNewLabel_2 = new JLabel("Fone:");
+		lblNewLabel_2.setBounds(177, 49, 48, 14);
+		panel.add(lblNewLabel_2);
+		
+		txtID = new JTextField();
+		txtID.setBounds(30, 8, 67, 20);
+		panel.add(txtID);
+		txtID.setColumns(10);
+		
+		txtNome = new JTextField();
+		txtNome.setBounds(235, 8, 96, 20);
+		panel.add(txtNome);
+		txtNome.setColumns(10);
+		
+		txtCPF = new JTextField();
+		txtCPF.setBounds(40, 46, 96, 20);
+		panel.add(txtCPF);
+		txtCPF.setColumns(10);
+		
+		txtFone = new JTextField();
+		txtFone.setBounds(235, 46, 96, 20);
+		panel.add(txtFone);
+		txtFone.setColumns(10);
 	}
 	
 	private void pdfImprimir() {
@@ -258,6 +340,18 @@ public class Consulta extends JFrame {
 		}
 	}
 	
+//	private void limpar() {
+//		txtId.setText(null);
+//		dtConsulta.setText(null);
+//		cboHorario.setModel(new DefaultComboBoxModel(new String[] {""}));
+//		cboTipo.setModel(new DefaultComboBoxModel(new String[] {""}));
+//		cboNome.setModel(new DefaultComboBoxModel(new String[] {""}));
+//		txtPreco.setText(null);
+//		cboNome.setModel(new DefaultComboBoxModel(new String[] {""}));
+//		cboSituacao.setModel(new DefaultComboBoxModel(new String[] {""}));
+//		
+//	}
+	
 	
 	
 	//CRUD
@@ -266,17 +360,18 @@ public class Consulta extends JFrame {
 	//ADICIONAR
 	
 	private void adicionarConsulta() {
-		String create = "insert into tb_consulta (dataConsulta, horarioConsulta, tipoEspecialista, nomeEspecialista, preco, situacaoConsulta)"
-				+ "values(?,?,?,?,?,?)";
+		String create = "insert into tb_consulta (dataConsulta, horarioConsulta, tipoEspecialista, nomeEspecialista, preco, situacaoConsulta, idConsulta)"
+				+ "values(?,?,?,?,?,?,?)";
 		try {
 			pst = (PreparedStatement) con.prepareStatement(create);
 			// passagem de parâmetros
-			pst.setString(1, dtConsulta.getDateFormatString());
+			pst.setString(1, dtConsulta.getText());
 			pst.setString(2, cboHorario.getSelectedItem().toString());
 			pst.setString(3, cboTipo.getSelectedItem().toString());
 			pst.setString(4, cboNome.getSelectedItem().toString());
 			pst.setString(5, txtPreco.getText());
 			pst.setString(6, cboSituacao.getSelectedItem().toString());
+			pst.setString(7, txtId.getText());
 
 			
 			int r = pst.executeUpdate();
@@ -293,4 +388,119 @@ public class Consulta extends JFrame {
 		} // fim do catch
 
 	}// fim do construtor
+	
+	//ALTERAR
+	private void alterarConsulta() {
+		String update = "update tb_consulta set dataConsulta=?, horarioConsulta=?, tipoEspecialista=?, nomeEspecialista=?, preco=?, situacaoConsulta=? where idConsulta=?";
+		try {
+			pst = (PreparedStatement) con.prepareStatement(update);
+			//passagem de parâmetros
+			//ATENÇÃO id é o 4° parâmetro
+			pst.setString(1, dtConsulta.getText().toString());
+			pst.setString(2, cboHorario.getSelectedItem().toString());
+			pst.setString(3, cboTipo.getSelectedItem().toString());
+			pst.setString(4, cboNome.getSelectedItem().toString());
+			pst.setString(5, txtPreco.getText());
+			pst.setString(6, cboSituacao.getSelectedItem().toString());
+			pst.setString(7, txtId.getText().toString());
+			int r = pst.executeUpdate();//EXECUTA E ARMAZENA NA VARIAVEL (R)
+			if (r > 0) {
+				JOptionPane.showMessageDialog(null, "Consulta alterada com sucesso!");
+			//	limpar();
+			} else {
+				JOptionPane.showMessageDialog(null, "Não foi possível alterar");
+			//	limpar();
+			}
+			
+		}catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	private void pesquisarConsulta() {
+		String read = "select * from tb_consulta where idConsulta =?";
+		// Usamos o try catch para tratar exceção
+		try {
+			pst = (PreparedStatement) con.prepareStatement(read);
+			// passagem do parâmetro
+			pst.setString(1, txtId.getText());
+			// atribuimos a variavel rs retorno do comando
+			rs = pst.executeQuery();// Executar a query(sql)
+			//
+			if (rs.next()) {
+				dtConsulta.setText(rs.getString(2));
+				cboHorario.setSelectedItem(rs.getString(3));
+				cboTipo.setSelectedItem(rs.getString(4));
+				cboNome.setSelectedItem(rs.getString(5));
+				txtPreco.setText(rs.getString(6));
+				cboSituacao.setSelectedItem(rs.getString(7));
+
+			} else {
+				JOptionPane.showMessageDialog(null, "Consulta inexistente!");
+			//	limpar();
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}// fim do construtor
+	
+	
+	//Delete
+	private void removerConsulta() {
+		// criar uma caixa de diálogo para confirmar a exclusão
+		int confirma = JOptionPane.showConfirmDialog(null, "Confirma a exclusão desta consulta ?", "Atenção",
+				JOptionPane.YES_NO_OPTION);
+		if (confirma == JOptionPane.YES_NO_OPTION) {
+			String delete = "delete from tb_consulta where idConsulta=?";
+
+			try {
+					pst = (PreparedStatement) con.prepareStatement(delete);
+					pst.setString(1, txtId.getText());
+					int r = pst.executeUpdate();
+					if (r > 0) {
+					//	limpar();
+						JOptionPane.showMessageDialog(null, "Consulta deletada com sucesso!");
+	
+				} else {
+					JOptionPane.showMessageDialog(null, "Não foi possivel remover o consulta!");
+				}
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+
+		} // fim do if
+
+	}// fim do construtor
+	
+	
+//METODO PESQUISAR CLIENTES PELO NOME COM FILTRO
+	private void pesquisarPaciente() {
+        String read = "select * from tb_clientes where nomeCli like ?";
+        try {
+            pst = (PreparedStatement) con.prepareStatement(read);
+            //atenção ao "%" - continuação da String sql
+            pst.setString(1, txtIdConsulta.getText() + "%");
+            rs = pst.executeQuery();
+            // a linha abaixo usa a biblioteca rs2xml.jar para preencher a tabela
+            table.setModel(DbUtils.resultSetToTableModel(rs));
+
+        } catch (Exception e) {
+			System.out.println(e);
+		}
+    }
+
+
+public void setarCampos() {
+	int setar = table.getSelectedRow();
+	txtID.setText(table.getModel().getValueAt(setar, 1).toString());
+	txtNome.setText(table.getModel().getValueAt(setar, 2).toString());
+	txtCPF.setText(table.getModel().getValueAt(setar, 3).toString());
+	txtFone.setText(table.getModel().getValueAt(setar, 4).toString());
+	
+	
+	
+	
 }
+}
+	
+	
